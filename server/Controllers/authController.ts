@@ -12,19 +12,21 @@ function generateToken(id:string) {
 /// Api for REgister user
 /// api/auth/register
 
-export const registerUser = async (req: Request, res:Response) => {
+export const registerUser = async (req: Request, res:Response):Promise<void> => {
        const {name, email, password, phone, role} = req.body
 
         try {
             
        if(!name || !email || !password){
-          return res.status(400).json({message: 'please fill all the required field'})
+          res.status(400).json({message: 'please fill all the required field'})
+          return;
        }
 
        // check user existing 
        const existingUser = await User.findOne({email});
         if (existingUser) {
-         return res.status(400).json({message: 'user already existing'})
+          res.status(400).json({message: 'user already existing'})
+          return;
        }
 
        /// hashpassword 
@@ -42,7 +44,7 @@ export const registerUser = async (req: Request, res:Response) => {
       })
 
        if (user) {
-         return res.status(200).json({
+         res.status(200).json({
             _id:user._id,
             name:user.name,
             email:user.email,
@@ -52,7 +54,8 @@ export const registerUser = async (req: Request, res:Response) => {
          })
 
        } else {
-         return res.status(400).json({message:'user data invalid'})
+         res.status(400).json({message:'user data invalid'})
+          return;
        }
 
         } catch (error: any) {
@@ -66,23 +69,26 @@ export const registerUser = async (req: Request, res:Response) => {
 /// Api for Login user
 /// api/auth/login
 
-export const LoginUser = async (req:Request, res:Response) => {
+export const LoginUser = async (req:Request, res:Response):Promise<void> => {
     try {
         const {password, email} = req.body;
 
         if (!password || !email) {
-           return res.status(400).json({message:'All field is required'})
+            res.status(400).json({message:'All field is required'})
+            return;
         }
       
     /// check existing user 
        const existingUser = await User.findOne({email});
        if (!existingUser) {
-         return res.status(400).json({message:'invalid email or password'})
+          res.status(400).json({message:'invalid email or password'})
+          return;
        }
     /// check password 
     const comparepassword = await bcrypt.compare(password, existingUser.password || '')
     if (! comparepassword) {
-        return res.status(400).json({message:'password is invalid'})
+        res.status(400).json({message:'password is invalid'})
+        return;
     }
 
     res.json({
@@ -100,3 +106,8 @@ export const LoginUser = async (req:Request, res:Response) => {
         res.status(400).json({message:error.message})
     }
 }
+
+// Get user profile
+// GET api/auth/me
+// #access private 
+
