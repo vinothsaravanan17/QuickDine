@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { User } from "../model/Users.js";
 import bcrypt from 'bcrypt'
 import { ifError } from "node:assert";
+import { AuthRequest } from "../Middleware/Auth.js";
 /// helper to generate jwt token
 
 function generateToken(id:string) {
@@ -110,4 +111,15 @@ export const LoginUser = async (req:Request, res:Response):Promise<void> => {
 // Get user profile
 // GET api/auth/me
 // #access private 
+
+export const getme = async (req:AuthRequest, res:Response):Promise<void> => {
+    try {
+        if (!req.user) {
+           res.status(401).json({message:'Not Authorized'}) 
+        }
+    } catch (error:any) {
+        console.error(error);
+        res.status(400).json({message:error.message})
+    }
+}
 
