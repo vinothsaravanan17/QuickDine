@@ -40,5 +40,25 @@ export const protect = async (
   if (!token) {
       res.status(401).json({messsage:'not Authotized, No token'})
   }
-  
+
 };
+
+export const AdminOnly  = (req:AuthRequest, res:Response, next:NextFunction): void=> {
+  if (req.user && req.user.role === "admin") {
+      next()
+  } else {
+    res.status(403).json({message:'Accese Denied, Admin role Required'})
+  }
+}
+
+
+export const OwnerOnly = (req:AuthRequest, res:Response, next:NextFunction): void => {
+     if (req.user && req.user.role === "admin" || req.user?.role === 'owner') {
+       next()
+     } else {
+       res.status(403).json({message:"accese Denied, Admin Or Owner role required"})
+     }
+} 
+
+
+
